@@ -1,11 +1,11 @@
 note
-	description: "Summary description for {AP_SLOT_FLAG}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Flags used to know what kind of item the client manage."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
-	AP_SLOT_FLAG
+	AP_ITEM_MANAGEMENT
 
 create
 	make_no_item_handeling,

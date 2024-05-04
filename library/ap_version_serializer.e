@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_VERSION_SERIALIZER}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "JSON serializer for objet of type {AP_VERSION}."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_VERSION_SERIALIZER

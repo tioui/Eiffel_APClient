@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_VERSION}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "A version with 3 numbers (major, minor, build)."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_VERSION

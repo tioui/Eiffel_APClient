@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_PERMISSION}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Permission of the client."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 expanded class
 	AP_PERMISSION

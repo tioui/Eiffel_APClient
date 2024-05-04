@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_SLOT_CONNECT}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Message of slot connection to send"
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_SLOT_CONNECT
@@ -16,7 +16,7 @@ create
 feature {NONE} -- Initialisation
 
 	make(a_game, a_uuid, a_name, a_password:STRING; a_version: AP_VERSION;
-			a_items_handling: AP_SLOT_FLAG; a_tags:LIST[STRING])
+			a_items_handling: AP_ITEM_MANAGEMENT; a_tags:LIST[STRING])
 		do
 			default_create
 			game := a_game.twin

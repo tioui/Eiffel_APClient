@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_GAME}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Informations about an Archipelago game"
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_GAME
@@ -13,6 +13,7 @@ create
 feature -- Initialisation
 
 	make(a_name:STRING)
+			-- Initialisation of `Current' using `name' as `a_name'
 		do
 			name := a_name.twin
 			datapackage_version := 0
@@ -24,14 +25,18 @@ feature -- Initialisation
 feature -- Access
 
 	name:STRING
+			-- How the game is named
 
 	datapackage_version: INTEGER
+			-- The version of the datapackage of `Current'
 
 	datapackage_checksum: STRING
+			-- The checksum of the datapackage of `Current'
 
 feature {AP_ROOM_INFO} -- Setters
 
 	set_datapackage_version(a_version:INTEGER)
+			-- Assign `datapackage_version' with `a_version'
 		do
 			datapackage_version := a_version
 		ensure
@@ -39,6 +44,7 @@ feature {AP_ROOM_INFO} -- Setters
 		end
 
 	set_datapackage_checksum(a_checksum:STRING)
+			-- Assign `datapackage_checksum' with `a_checksum'
 		do
 			datapackage_checksum := a_checksum
 		ensure

@@ -1,7 +1,8 @@
 note
-	description: "console_client application root class"
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "A testing console for Archipelago client"
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	APPLICATION
@@ -33,16 +34,18 @@ feature {NONE} -- Initialization
 		end
 
 	on_room_info(a_room_info:AP_ROOM_INFO)
+			-- When `a_room_info' has been received from the server.
 		local
 			l_tags:ARRAYED_LIST[STRING]
 		do
 			create l_tags.make (1)
 			l_tags.extend ("DebugClient")
 			print(a_room_info.out)
-			apclient.connect_slot ("Louis", "", l_tags, create {AP_SLOT_FLAG}.make_no_item_handeling,
+			apclient.connect_slot ("Louis", "", l_tags, create {AP_ITEM_MANAGEMENT}.make_no_item_handeling,
 								create {AP_VERSION}.make (0, 4, 6))
 		end
 
 	apclient: AP_CLIENT
+			-- The Archipelago client
 
 end

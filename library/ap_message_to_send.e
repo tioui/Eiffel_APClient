@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_MESSAGE_TO_SEND}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "A common ancestor to every message to send."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 deferred class
 	AP_MESSAGE_TO_SEND

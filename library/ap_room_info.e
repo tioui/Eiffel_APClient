@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_ROOM_INFO}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Information about the room."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_ROOM_INFO

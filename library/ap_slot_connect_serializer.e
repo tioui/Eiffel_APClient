@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_SLOT_CONNECT_SERIALIZER}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "JSON serializer for object of type {AP_SLOT_CONNECT}."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_SLOT_CONNECT_SERIALIZER
@@ -19,7 +19,6 @@ feature --Conversion
 			l_object: JSON_OBJECT
 			l_json_version:JSON_VALUE
 			l_json_tags:JSON_ARRAY
-			l_index:INTEGER
 		do
 			if attached {AP_SLOT_CONNECT} a_object as la_message then
 				create l_object.make_with_capacity (8)

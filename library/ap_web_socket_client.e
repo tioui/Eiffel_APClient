@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {AP_WEB_SOCKET_CLIENT}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "A Websocket client to use with Archipelago server."
+	author: "Louis M"
+	date: "Sat, 04 May 2024 01:35:20 +0000"
+	revision: "0.1"
 
 class
 	AP_WEB_SOCKET_CLIENT
@@ -55,6 +55,7 @@ feature {NONE} -- Initialisation
 feature -- Access
 
 	server_uri:READABLE_STRING_GENERAL
+			-- The URI of the server.
 
 
 
@@ -114,6 +115,7 @@ feature {NONE} -- Events API
 feature {NONE} -- TCP connection
 
 	connection: HTTP_STREAM_SOCKET
+			-- The connection socket
 		do
 			Result := socket
 		end
