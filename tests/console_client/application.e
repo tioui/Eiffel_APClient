@@ -16,15 +16,19 @@ feature {NONE} -- Initialization
 
 	make
 			-- Run application.
+		local
+			l_command:STRING
 		do
-			create apclient.make ("Archipelago", "ws://localhost:38281")
+			create apclient.make ("Aquaria", "ws://localhost:38281")
 			apclient.room_info_actions.extend (agent on_room_info)
 			apclient.connect
 			from
+				l_command := ""
 			until
-				True
+				l_command ~ "/exit"
 			loop
-				
+				io.read_line
+				l_command := io.last_string
 			end
 		end
 
