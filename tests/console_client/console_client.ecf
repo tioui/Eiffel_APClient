@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="console_client" uuid="CE792414-1117-4A8B-A9F3-43F037D0982E">
+	<target name="console_client">
+		<root class="APPLICATION" feature="make"/>
+		<file_rule>
+			<exclude>/CVS$</exclude>
+			<exclude>/EIFGENs$</exclude>
+			<exclude>/\.git$</exclude>
+			<exclude>/\.svn$</exclude>
+		</file_rule>
+		<option warning="true" manifest_array_type="mismatch_warning">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="console_application" value="true"/>
+		<setting name="dead_code_removal" value="feature"/>
+		<capability>
+			<catcall_detection support="none"/>
+			<concurrency support="thread" use="thread"/>
+			<void_safety support="all"/>
+		</capability>
+		<precompile name="base_pre" location="$ISE_PRECOMP\base-mt-safe.ecf"/>
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<variable name="ssl_enabled" value="true"/>
+		<library name="eiffel_apclient" location="..\..\library\eiffel_apclient.ecf" readonly="false"/>
+		<cluster name="console_client" location=".\" recursive="true"/>
+	</target>
+</system>

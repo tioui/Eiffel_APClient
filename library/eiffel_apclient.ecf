@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-20-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-20-0 http://www.eiffel.com/developers/xml/configuration-1-20-0.xsd" name="eiffel_apclient" uuid="731D8213-3949-4B1F-9B19-19728BEA0412" library_target="eiffel_apclient">
+	<target name="eiffel_apclient">
+		<root all_classes="true"/>
+		<file_rule>
+			<exclude>/CVS$</exclude>
+			<exclude>/EIFGENs$</exclude>
+			<exclude>/\.git$</exclude>
+			<exclude>/\.svn$</exclude>
+		</file_rule>
+		<option warning="true" manifest_array_type="mismatch_warning">
+		</option>
+		<setting name="dead_code_removal" value="feature"/>
+		<capability>
+			<catcall_detection support="none"/>
+			<concurrency support="scoop" use="thread"/>
+			<void_safety support="all"/>
+		</capability>
+		<variable name="ssl_enabled" value="true"/>
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="http_network" location="$ISE_LIBRARY\contrib\library\network\http_network\http_network.ecf"/>
+		<library name="json" location="$ISE_LIBRARY\contrib\library\text\parser\json\library\json.ecf"/>
+		<library name="thread" location="$ISE_LIBRARY\library\thread\thread.ecf"/>
+		<library name="time" location="$ISE_LIBRARY\library\time\time.ecf"/>
+		<library name="uri" location="$ISE_LIBRARY\library\text\uri\uri.ecf"/>
+		<library name="uuid" location="$ISE_LIBRARY\library\uuid\uuid.ecf"/>
+		<library name="web_socket_client" location="$ISE_LIBRARY\contrib\library\network\websocket\client\web_socket_client.ecf"/>
+		<cluster name="eiffel_apclient" location=".\" recursive="true"/>
+	</target>
+</system>
