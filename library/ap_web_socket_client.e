@@ -10,7 +10,7 @@ class
 inherit
 	WEB_SOCKET_CLIENT
 		redefine
-			host
+			host, execute
 		end
 
 create
@@ -19,7 +19,8 @@ create
 feature {NONE} -- Initialisation
 
 	make(a_server:READABLE_STRING_GENERAL)
-			-- Initialisation of `Current' using `a_server` as host and port (separaed with :)
+			-- Initialisation of `Current' using `a_server` as host and port
+			-- (separated with :)
 		local
 			l_server:READABLE_STRING_GENERAL
 			l_server_uri:READABLE_STRING_GENERAL
@@ -57,7 +58,47 @@ feature -- Access
 	server_uri:READABLE_STRING_GENERAL
 			-- The URI of the server.
 
+	is_connected:BOOLEAN
+			-- The Web socket is connected to a server.
+		do
+			result := socket.is_connected and is_server_hanshake_accepted
+		end
 
+	execute
+			-- Opening connection and launching the poll system.
+		require else
+			is_socket_valid: socket.exists
+		do
+			set_implementation
+			socket.connect
+			if socket.is_connected then
+				send_handshake
+				receive_handshake
+				if is_server_hanshake_accepted then
+					ready_state.set_state ({WEB_SOCKET_READY_STATE}.open)
+					on_websocket_open ("Open Connection")
+					from
+					until
+						ready_state.is_closed or has_error
+					loop
+						receive
+					end
+				else
+					on_websocket_error ("Server Handshake not accepted")
+						--log(Not connected)
+					socket.close
+				end
+			else
+				on_error ("Cannot connect to " + server_uri)
+					--log(Not connected)
+				socket.close
+			end
+
+
+		rescue
+			on_websocket_close ("")
+			socket.close
+		end
 
 feature -- Event handlers
 

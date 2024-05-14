@@ -19,7 +19,7 @@ create
 	make_with_uuid,
 	make_with_uuid_and_certificate_store
 
-feature {NONE}
+feature {NONE} -- Initialisation
 
 	make_with_uuid_and_certificate_store (a_game, a_server, a_uuid, a_certificate_store: STRING)
 			-- Initialisation of `Current' using `a_game' as `game', `a_uuid' as `uuid'
@@ -39,10 +39,12 @@ feature {NONE}
 			json_serializer.register (create {AP_VERSION_SERIALIZER}, {detachable AP_VERSION})
 			game := a_game.twin
 			uuid := a_uuid.twin
+			giving_up := False
+			server := a_server.twin
 			create room_info_actions
 			create connected_actions
-			create socket_client.make (a_server)
-			socket_client.text_message_actions.extend (agent on_text_message)
+			create error_actions
+			initialize_socket(a_server)
 		ensure
 			game_assign: game ~ a_game
 			uuid_assign: uuid ~ a_uuid
@@ -62,13 +64,24 @@ feature {NONE}
 			make_with_uuid (a_game, a_server, generate_uuid)
 		end
 
-feature
+	initialize_socket(a_server:STRING)
+			-- Initialize the `socket_client'
+		do
+			create socket_client.make (a_server)
+			socket_client.text_message_actions.extend (agent on_text_message)
+			socket_client.error_actions.extend (agent on_error)
+		end
+
+feature -- Access
 
 	game: STRING
 			-- The name of the game client.
 
 	uuid: STRING
 			-- The unique ID of this execution.
+
+	server:STRING
+			-- The address used to connect to the server
 
 	has_room_info: BOOLEAN
 			-- The Room info has been loaded (after the call to `connect').
@@ -88,7 +101,7 @@ feature
 			end
 		end
 
-feature
+feature	-- Events
 
 	room_info_actions: ACTION_SEQUENCE [TUPLE[room_info:AP_ROOM_INFO]]
 			-- Actions to launch when the room_info message has been received
@@ -104,16 +117,18 @@ feature
 
 	error_actions: ACTION_SEQUENCE [TUPLE[message:STRING]]
 			-- Actions to launch when there has been an error
-		do
-			Result := socket_client.error_actions
-		end
 
-feature
+	has_error:BOOLEAN
+			-- An error occured at connection
+
+feature -- Basic operations
 
 	generate_uuid: STRING
 			-- Generate an unique ID
 		do
 			Result := {UUID_GENERATOR}.generate_uuid.out
+		ensure
+			class
 		end
 
 	connect
@@ -121,6 +136,12 @@ feature
 			-- Create another thread.
 		do
 			launch
+			from
+			until
+				is_connected or giving_up
+			loop
+				yield
+			end
 		end
 
 	execute
@@ -128,6 +149,24 @@ feature
 			-- No not create another thread.
 		do
 			socket_client.execute
+			if not is_connected and not server.starts_with ("ws://") and
+					not server.starts_with ("wss://") then
+				initialize_socket("ws://" + server)
+				socket_client.execute
+				giving_up := True
+			end
+		end
+
+	close
+		do
+			socket_client.close (0)
+			join
+		end
+
+	is_connected:BOOLEAN
+			-- The web socket is connected
+		do
+			Result := socket_client.is_connected
 		end
 
 	connect_slot (a_player_name, a_password: STRING; a_tags: LIST [STRING]; a_item_flags: AP_ITEM_MANAGEMENT; a_version: AP_VERSION)
@@ -141,7 +180,17 @@ feature
 			send_message (l_connect)
 		end
 
-feature {NONE}
+feature {NONE} -- Implementation
+
+	giving_up:BOOLEAN
+			-- True if the connection seems impossible
+
+	on_error(a_message:STRING)
+			-- When the `socket_client' send a message.
+		do
+			has_error := True
+			error_actions.call (a_message)
+		end
 
 	send_messages (a_messages: FINITE [AP_MESSAGE_TO_SEND])
 			-- Send a list of messages (`a_messages') to the server.

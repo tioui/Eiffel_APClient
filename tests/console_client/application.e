@@ -20,17 +20,23 @@ feature {NONE} -- Initialization
 		local
 			l_command:STRING
 		do
-			create apclient.make ("Aquaria", "ws://localhost:38281")
+			create apclient.make ("Aquaria", "localhost:38281")
 			apclient.room_info_actions.extend (agent on_room_info)
 			apclient.connect
-			from
-				l_command := ""
-			until
-				l_command ~ "/exit"
-			loop
-				io.read_line
-				l_command := io.last_string
+			if apclient.is_connected then
+				from
+					l_command := ""
+				until
+					l_command ~ "/exit"
+				loop
+					io.read_line
+					l_command := io.last_string
+				end
+				apclient.close
+			else
+				print("Cannot connect... Closing.%N")
 			end
+
 		end
 
 	on_room_info(a_room_info:AP_ROOM_INFO)
