@@ -7,6 +7,10 @@ note
 deferred class
 	AP_MESSAGE
 
+feature {NONE} -- Implementation
+
+	utf_converter:UTF_CONVERTER
+
 feature -- Constants
 
 	Cmd_Identifier:STRING

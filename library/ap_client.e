@@ -21,7 +21,7 @@ create
 
 feature {NONE} -- Initialisation
 
-	make_with_uuid_and_certificate_store (a_game, a_server, a_uuid, a_certificate_store: STRING)
+	make_with_uuid_and_certificate_store (a_game:READABLE_STRING_GENERAL; a_server, a_uuid, a_certificate_store: STRING)
 			-- Initialisation of `Current' using `a_game' as `game', `a_uuid' as `uuid'
 			-- `a_server' as server URI and `a_certificate_store' as certificate file.
 		do
@@ -29,13 +29,13 @@ feature {NONE} -- Initialisation
 			socket_client.set_secure_certificate_file (create {PATH}.make_from_string (a_certificate_store))
 		end
 
-	make_with_uuid (a_game, a_server, a_uuid: STRING)
+	make_with_uuid (a_game:READABLE_STRING_GENERAL; a_server, a_uuid: STRING)
 			-- Initialisation of `Current' using `a_game' as `game', `a_uuid' as `uuid'
 			-- `a_server' as server URI.
 		do
 			make_thread
 			create json_serializer
-			json_serializer.register (create {AP_SLOT_CONNECT_SERIALIZER}, {detachable AP_SLOT_CONNECT})
+			json_serializer.register (create {AP_SLOT_CONNECT_SERIALIZER}, {detachable AP_SLOT_CONNECT_UPDATE})
 			json_serializer.register (create {AP_VERSION_SERIALIZER}, {detachable AP_VERSION})
 			game := a_game.twin
 			uuid := a_uuid.twin
@@ -44,6 +44,7 @@ feature {NONE} -- Initialisation
 			create room_info_actions
 			create connected_actions
 			create error_actions
+			create slot_connected_actions
 			initialize_socket(a_server)
 		ensure
 			game_assign: game ~ a_game
@@ -51,14 +52,14 @@ feature {NONE} -- Initialisation
 			server_valid: socket_client.Server ~ a_server.to_string_8
 		end
 
-	make_with_certificate_store (a_game, a_server, a_certificate_store: STRING)
+	make_with_certificate_store (a_game:READABLE_STRING_GENERAL; a_server, a_certificate_store: STRING)
 			-- Initialisation of `Current' using `a_game' as `game',
 			-- `a_server' as server URI and `a_certificate_store' as certificate file.
 		do
 			make_with_uuid_and_certificate_store (a_game, a_server, generate_uuid, a_certificate_store)
 		end
 
-	make (a_game, a_server: STRING)
+	make (a_game:READABLE_STRING_GENERAL; a_server: STRING)
 			-- Initialisation of `Current' using `a_game' as `game' and `a_server' as server URI.
 		do
 			make_with_uuid (a_game, a_server, generate_uuid)
@@ -74,7 +75,7 @@ feature {NONE} -- Initialisation
 
 feature -- Access
 
-	game: STRING
+	game: READABLE_STRING_GENERAL;
 			-- The name of the game client.
 
 	uuid: STRING
@@ -101,7 +102,27 @@ feature -- Access
 			end
 		end
 
+	has_slots_info: BOOLEAN
+			-- The Slots info has been loaded (after the call to `connect_slot').
+		do
+			Result := attached internal_slots_info
+		end
+
+	slots_info: AP_SLOT_CONNECTION_INFO
+			-- The slots information (after the call to `connect_slot').
+		require
+			Has_Slots_Info: has_slots_info
+		do
+			check
+					attached internal_slots_info as la_slots_info
+			then
+				Result := la_slots_info
+			end
+		end
+
 feature	-- Events
+
+	slot_connected_actions:ACTION_SEQUENCE [TUPLE[slot_connection_info:AP_SLOT_CONNECTION_INFO]]
 
 	room_info_actions: ACTION_SEQUENCE [TUPLE[room_info:AP_ROOM_INFO]]
 			-- Actions to launch when the room_info message has been received
@@ -175,10 +196,28 @@ feature -- Basic operations
 			-- server version compatibility.
 		local
 			l_connect: AP_SLOT_CONNECT
+			l_converter:UTF_CONVERTER
+			l_game:STRING
 		do
-			create l_connect.make (game, uuid, a_player_name, a_password, a_version, a_item_flags, a_tags)
+			if game.is_string_32 then
+				l_game := l_converter.utf_32_string_to_utf_8_string_8 (game.to_string_32)
+			else
+				l_game := game.to_string_8
+			end
+			create l_connect.make (l_game, uuid, a_player_name, a_password, a_version, a_item_flags, a_tags)
 			send_message (l_connect)
 		end
+
+	update_slot (a_tags: LIST [STRING]; a_item_flags: AP_ITEM_MANAGEMENT)
+			-- Update the player slot using `a_tags' as slot tags and `a_item_flags'
+			-- as item management flags
+		local
+			l_connect: AP_SLOT_CONNECT_UPDATE
+		do
+			create l_connect.make (a_item_flags, a_tags)
+			send_message (l_connect)
+		end
+
 
 feature {NONE} -- Implementation
 
@@ -218,6 +257,9 @@ feature {NONE} -- Implementation
 	internal_room_info: detachable AP_ROOM_INFO
 			-- Internal version of `room_info.
 
+	internal_slots_info: detachable AP_SLOT_CONNECTION_INFO
+			-- Internal version of `slots_info.
+
 	on_text_message (a_message: STRING)
 			-- Launch when a text message is received from the server.
 		local
@@ -241,12 +283,18 @@ feature {NONE} -- Implementation
 		local
 			l_cmd: STRING
 			l_room_info: AP_ROOM_INFO
+			l_slot_connected: AP_SLOT_CONNECTION_INFO
 		do
+			--print("Message: " + a_message.representation + "%N")
 			l_cmd := {AP_MESSAGE_INFO}.cmd_message (a_message)
 			if l_cmd ~ {AP_ROOM_INFO}.cmd_identifier then
 				create l_room_info.make (a_message)
 				internal_room_info := l_room_info
 				room_info_actions.call (l_room_info)
+			elseif l_cmd ~ {AP_SLOT_CONNECTION_INFO}.cmd_identifier then
+				create l_slot_connected.make(a_message)
+				internal_slots_info := l_slot_connected
+				slot_connected_actions.call (l_slot_connected)
 			end
 		end
 
@@ -258,6 +306,11 @@ feature {NONE} -- Implementation
 
 	socket_client: AP_WEB_SOCKET_CLIENT
 			-- The websocket client
+
+
+
+--Message: {"cmd":"PrintJSON","data":[{"text":"Louis (Team #1) playing Aquaria has joined. Client(0.4.6), ['DebugClient']."}],"type":"Join","team":0,"slot":1,"tags":["DebugClient"]}
+--Message: {"cmd":"PrintJSON","data":[{"text":"Now that you are connected, you can use !help to list commands to run via the server. If your client supports it, you may have additional local commands you can list with /help."}],"type":"Tutorial"}
 
 end
 

@@ -64,7 +64,7 @@ feature {NONE} -- Initialisation
 		end
 
 	initialise_permissions(a_message:JSON_OBJECT)
-			-- Initialisation of the `*_permission' attributes
+			-- Initialisation of the `*_permission' attributes with the data of `a_message'
 		do
 			if attached {JSON_OBJECT} a_message.item ("permissions") as la_permissions then
 				if attached {JSON_NUMBER} la_permissions.item ("release") as la_release then
@@ -80,35 +80,36 @@ feature {NONE} -- Initialisation
 		end
 
 	initialise_tags(a_message:JSON_OBJECT)
-			-- Initialisation of the `tags' attributes
+			-- Initialisation of the `tags' attributes with the data of `a_message'
 		do
 			if attached {JSON_ARRAY} a_message.item ("tags") as la_tags then
-				create {ARRAYED_LIST[STRING]}tags.make(la_tags.count)
+				create {ARRAYED_LIST[STRING_32]}tags.make(la_tags.count)
 				across la_tags as lla_tags loop
 					if attached {JSON_STRING} lla_tags.item as la_item then
-						tags.extend (la_item.item)
+						tags.extend (utf_converter.utf_8_string_8_to_string_32 (la_item.item))
 					end
 				end
 			else
-				create {LINKED_LIST[STRING]}tags.make
+				create {LINKED_LIST[STRING_32]}tags.make
 			end
 		end
 
 	initalise_time(a_time:DOUBLE)
-			-- Initialisation of the `time' attributes
+			-- Initialisation of the `time' attributes using `a_time' as internal value
 		do
 			create time.make_from_epoch (a_time.truncated_to_integer)
 			time.time.set_fractionals (a_time-a_time.truncated_to_integer)
 		end
 
 	fill_games(a_message:JSON_OBJECT)
-			-- Initialisation of the `games' attributes
+			-- Initialisation of the `games' attributes with the data of `a_message'
 		do
 			if attached {JSON_ARRAY} a_message.item ("games") as la_games then
 				create {ARRAYED_LIST[AP_GAME]}games.make (la_games.count)
 				across la_games as lla_games loop
 					if attached {JSON_STRING} lla_games.item as la_item then
-						games.extend (create {AP_GAME}.make (la_item.item) )
+						games.extend (create {AP_GAME}.make (
+								utf_converter.utf_8_string_8_to_string_32 (la_item.item)) )
 					end
 				end
 			else
@@ -123,7 +124,7 @@ feature {NONE} -- Initialisation
 		end
 
 	fill_games_version(a_versions:JSON_OBJECT)
-			-- Initialisation of the `games' datastore version
+			-- Initialisation of the `games' datastore version with the data of `a_version'
 		do
 			across games as la_games loop
 				if attached {JSON_NUMBER} a_versions.item (la_games.item.name) as la_version then
@@ -133,7 +134,7 @@ feature {NONE} -- Initialisation
 		end
 
 	fill_games_checksum(a_checksums:JSON_OBJECT)
-			-- Initialisation of the `games' datastore checksum
+			-- Initialisation of the `games' datastore checksum with the data of `a_checksums'
 		do
 			across games as la_games loop
 				if attached {JSON_STRING} a_checksums.item (la_games.item.name) as la_checksums then
@@ -150,7 +151,7 @@ feature -- Access
 	games:LIST[AP_GAME]
 			-- The games in the MultiWorld
 
-	tags:LIST[STRING]
+	tags:LIST[STRING_32]
 			-- The server tags
 
 	version:AP_VERSION
@@ -181,6 +182,12 @@ feature -- Access
 			-- The time of the server when receiving the message
 
 	out:STRING
+			-- Text representation of `Current'
+		do
+			Result := out32.to_string_8
+		end
+
+	out32:STRING_32
 			-- Text representation of `Current'
 		do
 			Result := "Room Info:%N"

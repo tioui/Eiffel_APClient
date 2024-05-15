@@ -8,7 +8,12 @@ class
 	AP_SLOT_CONNECT
 
 inherit
-	AP_MESSAGE_TO_SEND
+	AP_SLOT_CONNECT_UPDATE
+		rename
+			make as make_update
+		redefine
+			Cmd_identifier
+		end
 
 create
 	make
@@ -18,7 +23,7 @@ feature {NONE} -- Initialisation
 	make(a_game, a_uuid, a_name, a_password:STRING; a_version: AP_VERSION;
 			a_items_handling: AP_ITEM_MANAGEMENT; a_tags:LIST[STRING])
 		do
-			default_create
+			make_update(a_items_handling, a_tags)
 			game := a_game.twin
 			uuid := a_uuid.twin
 			name := a_name.twin
@@ -57,12 +62,6 @@ feature -- Access
 
 	version: AP_VERSION
 			-- The Archipelago version compatible with the client
-
-	items_handling: INTEGER
-			-- The item handling flags
-
-	tags: LIST[STRING]
-			-- The tags of the connection slot
 
 feature -- Constants
 

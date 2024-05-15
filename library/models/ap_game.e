@@ -12,7 +12,7 @@ create
 
 feature -- Initialisation
 
-	make(a_name:STRING)
+	make(a_name:STRING_32)
 			-- Initialisation of `Current' using `name' as `a_name'
 		do
 			name := a_name.twin
@@ -24,7 +24,7 @@ feature -- Initialisation
 
 feature -- Access
 
-	name:STRING
+	name:STRING_32
 			-- How the game is named
 
 	datapackage_version: INTEGER

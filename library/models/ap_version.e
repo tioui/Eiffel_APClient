@@ -26,22 +26,31 @@ feature {NONE} -- Initialisation
 			major := a_major
 			minor := a_minor
 			build := a_build
+		ensure
+			Is_Major_Assign: major ~ a_major
+			Is_Minor_Assign: minor ~ a_minor
+			Is_Buildr_Assign: build ~ a_build
 		end
 
 	make_with_json(a_json:JSON_OBJECT)
 			-- Initialisation of `Current' using `a_json' to assign `major', `minor' and `build'
 		require
 			Is_Version: attached {JSON_STRING} a_json.item ("class") as la_item and then la_item.item ~ "Version"
+		local
+			l_major:INTEGER
+			l_minor:INTEGER
+			l_build:INTEGER
 		do
 			if attached {JSON_NUMBER} a_json.item ("major") as la_major then
-				major := la_major.integer_64_item.to_integer
+				l_major := la_major.integer_64_item.to_integer
 			end
 			if attached {JSON_NUMBER} a_json.item ("minor") as la_minor then
-				minor := la_minor.integer_64_item.to_integer
+				l_minor := la_minor.integer_64_item.to_integer
 			end
 			if attached {JSON_NUMBER} a_json.item ("build") as la_build then
-				build := la_build.integer_64_item.to_integer
+				l_build := la_build.integer_64_item.to_integer
 			end
+			make(l_major, l_minor, l_build)
 		end
 
 

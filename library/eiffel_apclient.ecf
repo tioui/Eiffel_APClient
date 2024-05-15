@@ -13,7 +13,7 @@
 		<setting name="dead_code_removal" value="feature"/>
 		<capability>
 			<catcall_detection support="none"/>
-			<concurrency support="scoop" use="thread"/>
+			<concurrency support="thread" use="thread"/>
 			<void_safety support="all"/>
 		</capability>
 		<variable name="ssl_enabled" value="true"/>
